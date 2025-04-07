@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Form, Input, Button } from "@heroui/react";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
-import Dropbox from "@/components/dropbox";
 
 export default function DocsPage() {
 
@@ -12,8 +11,6 @@ export default function DocsPage() {
 
   return (
       <DefaultLayout>
-
-        <Dropbox />
 
         <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
           <div className="inline-block max-w-lg text-center justify-center">

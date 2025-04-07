@@ -1,5 +1,4 @@
 import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import {
@@ -24,6 +23,7 @@ import {
   SearchIcon,
 } from "@/components/icons";
 import { Logo } from "@/components/icons";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@heroui/react";  // Agregar el Dropdown aquí
 
 export const Navbar = () => {
   const searchInput = (
@@ -33,11 +33,6 @@ export const Navbar = () => {
         inputWrapper: "bg-default-100",
         input: "text-sm",
       }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
       labelPlacement="outside"
       placeholder="Search..."
       startContent={
@@ -57,7 +52,7 @@ export const Navbar = () => {
             href="/"
           >
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">MarmiMangas</p>
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">
@@ -92,20 +87,40 @@ export const Navbar = () => {
           <Link isExternal href={siteConfig.links.github} title="GitHub">
             <GithubIcon className="text-default-500" />
           </Link>
-          <ThemeSwitch />
+          {/* <ThemeSwitch /> */}
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
+        <NavbarItem className="hidden lg:flex">
+          {searchInput}
+        </NavbarItem>
+
+        {/* Dropdown junto al input de búsqueda */}
+        <NavbarItem className="flex items-center">
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <User
+                as="button"
+                avatarProps={{
+                  isBordered: true,
+                  src: "https://i.pravatar.cc/150?u=a042581f4e29026024d",  // Avatar de Tony Reichert
+                }}
+                className="transition-transform"
+                description="@MarmiManga"
+                name="Marmota Suprema"
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="User Actions" variant="flat">
+              <DropdownItem key="profile" className="h-14 gap-2">
+                <p className="font-bold">Iniciado con</p>
+                <p className="font-bold">@MarmiMangas</p>
+              </DropdownItem>
+              <DropdownItem key="Configuracion">Configuracion</DropdownItem>
+              <DropdownItem key="Mis_ventas">Mis ventas</DropdownItem>
+              <DropdownItem key="Whislist">Whislist</DropdownItem>
+              <DropdownItem key="Cerrar_sesion" color="danger">
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarItem>
       </NavbarContent>
 
@@ -127,8 +142,8 @@ export const Navbar = () => {
                   index === 2
                     ? "primary"
                     : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                    ? "danger"
+                    : "foreground"
                 }
                 href="#"
                 size="lg"
