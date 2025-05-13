@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model datos_usuario {
+  id             Int      @id @default(autoincrement())
+  nombre_usuario String   @db.VarChar(300)
+  nombre         String   @db.VarChar(200)
+  apellido       String   @db.VarChar(200)
+  telefono       String   @db.VarChar(300)
+  pais           String   @db.VarChar(100)
+  direccion      String   @db.VarChar(300)
+  codigo_postal  String   @db.VarChar(200)
+  url_avatar     String   @db.VarChar(300)
+  id_usuario     Int
+  usuarios       usuarios @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_datos")
+
+  @@index([id_usuario], map: "fk_usuario_datos")
+}
+
+model detalles_pedidos {
+  id        Int     @id @default(autoincrement())
+  id_pedido Int
+  id_mangas Int
+  mangas    mangas  @relation(fields: [id_mangas], references: [id], onUpdate: Restrict, map: "fk_manga")
+  pedidos   pedidos @relation(fields: [id_pedido], references: [id], onUpdate: Restrict, map: "fk_pedido")
+
+  @@index([id_mangas], map: "fk_manga")
+  @@index([id_pedido], map: "fk_pedido")
+}
+
+model favoritos {
+  id         Int      @id @default(autoincrement())
+  id_usuario Int
+  id_manga   Int
+  usuarios   usuarios @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_favoritos")
+
+  @@index([id_manga], map: "fk_mangas")
+  @@index([id_usuario], map: "fk_usuario_favoritos")
+}
+
+model img_mangas {
+  id       Int    @id @default(autoincrement())
+  id_manga Int
+  url_img  String @db.VarChar(300)
+  mangas   mangas @relation(fields: [id_manga], references: [id], onUpdate: Restrict, map: "fk_img_mangas")
+
+  @@index([id_manga], map: "fk_img_mangas")
+}
+
+model mangas {
+  id                   Int                @id @default(autoincrement())
+  id_usuario           Int
+  nombre               String             @db.VarChar(200)
+  precio               Float              @db.Float
+  cantidad             Int
+  estado_manga         String             @db.VarChar(100)
+  volumenes            String             @db.VarChar(100)
+  informacion_vendedor String             @db.VarChar(600)
+  vendido              Boolean
+  detalles_pedidos     detalles_pedidos[]
+  img_mangas           img_mangas[]
+  usuarios             usuarios           @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario")
+
+  @@index([id_usuario], map: "fk_usuario")
+}
+
+model pedidos {
+  id                                     Int                @id @default(autoincrement())
+  id_usuario                             Int
+  id_vendedor                            Int
+  precio                                 Int
+  estado                                 String             @db.VarChar(100)
+  detalles_pedidos                       detalles_pedidos[]
+  usuarios_pedidos_id_usuarioTousuarios  usuarios           @relation("pedidos_id_usuarioTousuarios", fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_pedido")
+  usuarios_pedidos_id_vendedorTousuarios usuarios           @relation("pedidos_id_vendedorTousuarios", fields: [id_vendedor], references: [id], onUpdate: Restrict, map: "fk_vendedor_pedido")
+
+  @@index([id_usuario], map: "fk_usuario_pedido")
+  @@index([id_vendedor], map: "fk_vendedor_pedido")
+}
+
+model usuarios {
+  id     Int    @id @default(autoincrement())
+  token  String @unique @db.VarChar(600)
+  correo String @db.VarChar(300) // <-- Añade este campo
+  datos_usuario                         datos_usuario[]
+  favoritos                             favoritos[]
+  mangas                                mangas[]
+  pedidos_pedidos_id_usuarioTousuarios  pedidos[]       @relation("pedidos_id_usuarioTousuarios")
+  pedidos_pedidos_id_vendedorTousuarios pedidos[]       @relation("pedidos_id_vendedorTousuarios")
+}

@@ -184,3 +184,111 @@ export const SearchIcon = (props: IconSvgProps) => (
     />
   </svg>
 );
+
+export const HeartIcon = ({
+  size = 24,
+  width,
+  height,
+  strokeWidth = 1.5,
+  fill = "none",
+  ...props
+}: {
+  size?: number;
+  width?: number;
+  height?: number;
+  strokeWidth?: number;
+  fill?: string;
+  [key: string]: any;
+}) => (
+  <svg
+    aria-hidden="true"
+    fill={fill}
+    focusable="false"
+    height={size || height}
+    role="presentation"
+    viewBox="0 0 24 24"
+    width={size || width}
+    {...props}
+  >
+    <path
+      d="M12.62 20.81C12.28 20.93 11.72 20.93 11.38 20.81C8.48 19.82 2 15.69 2 8.68998C2 5.59998 4.49 3.09998 7.56 3.09998C9.38 3.09998 10.99 3.97998 12 5.33998C13.01 3.97998 14.63 3.09998 16.44 3.09998C19.51 3.09998 22 5.59998 22 8.68998C22 15.69 15.52 19.82 12.62 20.81Z"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={strokeWidth}
+    />
+  </svg>
+);
+export const ChevronIcon = ({
+  size = 24,
+  width,
+  height,
+  strokeWidth = 1.5,
+  fill = "none",
+  ...props
+}: {
+  size?: number;
+  width?: number;
+  height?: number;
+  strokeWidth?: number;
+  fill?: string;
+  [key: string]: any;
+}) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <path
+      d="M15.5 19l-7-7 7-7"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
+    />
+  </svg>
+);
+export const EditPencilIcon: React.FC<{
+  size?: number;
+  width?: number;
+  height?: number;
+  strokeWidth?: number;
+  fill?: string;
+  [key: string]: any;
+}> = ({
+  size = 24,
+  width,
+  height,
+  strokeWidth = 1.5,
+  fill = "none",
+  ...props
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill={fill}
+    width={size || width}
+    height={size || height}
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M18.3785 8.44975L11.4637 15.3647C11.1845 15.6439 10.8289 15.8342 10.4417 15.9117L7.49994 16.5L8.08829 13.5582C8.16572 13.1711 8.35603 12.8155 8.63522 12.5363L15.5501 5.62132M18.3785 8.44975L19.7927 7.03553C20.1832 6.64501 20.1832 6.01184 19.7927 5.62132L18.3785 4.20711C17.988 3.81658 17.3548 3.81658 16.9643 4.20711L15.5501 5.62132M18.3785 8.44975L15.5501 5.62132"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 20H19"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
