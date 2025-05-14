@@ -65,7 +65,7 @@ export default function VentasPage() {
   // Si no hay ventas, mostrar mensaje y botón
   if (ventas.length === 0) {
     return (
-      <DefaultLayout hideFooter>
+      <DefaultLayout>
         <section className="flex flex-col items-center justify-center px-4">
           <h1 className={`${title()} text-center mb-6`}>Mis ventas</h1>
           <p className="text-default-500 text-center mb-6">

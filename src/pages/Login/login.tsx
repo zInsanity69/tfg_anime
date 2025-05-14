@@ -43,7 +43,7 @@ export default function Login() {
       console.log("Usuario con Google:", cred.user);
 
       const nuevoUsuario: UsuarioInput = {
-        token: cred.user ?? "",
+        correo: cred.user.email ?? "",
       };
       console.log("hola");
       await fetch("http://localhost:3001/api/usuarios", {

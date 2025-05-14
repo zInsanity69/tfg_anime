@@ -10,7 +10,7 @@ export interface MangaInput {
 }
 
 export interface UsuarioInput {
-  token: string;
+  correo: string;
 }
 
 export interface FavoritoInput {

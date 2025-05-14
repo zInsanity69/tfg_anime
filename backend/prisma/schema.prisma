@@ -20,18 +20,19 @@ model datos_usuario {
   id_usuario     Int
   usuarios       usuarios @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_datos")
 
-  @@index([id_usuario], map: "fk_usuario_datos")
+  @@index([id_usuario], map: "id_usuario")
 }
 
 model detalles_pedidos {
   id        Int     @id @default(autoincrement())
   id_pedido Int
   id_mangas Int
-  mangas    mangas  @relation(fields: [id_mangas], references: [id], onUpdate: Restrict, map: "fk_manga")
+  fecha     String  @db.VarChar(100)
   pedidos   pedidos @relation(fields: [id_pedido], references: [id], onUpdate: Restrict, map: "fk_pedido")
+  mangas    mangas  @relation(fields: [id_mangas], references: [id], onUpdate: Restrict, map: "fk_manga")
 
-  @@index([id_mangas], map: "fk_manga")
-  @@index([id_pedido], map: "fk_pedido")
+  @@index([id_mangas], map: "id_mangas")
+  @@index([id_pedido], map: "id_pedido")
 }
 
 model favoritos {
@@ -39,9 +40,10 @@ model favoritos {
   id_usuario Int
   id_manga   Int
   usuarios   usuarios @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_favoritos")
+  mangas     mangas   @relation(fields: [id_manga], references: [id], onUpdate: Restrict, map: "favoritos_ibfk_2")
 
-  @@index([id_manga], map: "fk_mangas")
-  @@index([id_usuario], map: "fk_usuario_favoritos")
+  @@index([id_manga], map: "id_manga")
+  @@index([id_usuario], map: "id_usuario")
 }
 
 model img_mangas {
@@ -50,7 +52,7 @@ model img_mangas {
   url_img  String @db.VarChar(300)
   mangas   mangas @relation(fields: [id_manga], references: [id], onUpdate: Restrict, map: "fk_img_mangas")
 
-  @@index([id_manga], map: "fk_img_mangas")
+  @@index([id_manga], map: "id_manga")
 }
 
 model mangas {
@@ -64,10 +66,11 @@ model mangas {
   informacion_vendedor String             @db.VarChar(600)
   vendido              Boolean
   detalles_pedidos     detalles_pedidos[]
+  favoritos            favoritos[]
   img_mangas           img_mangas[]
   usuarios             usuarios           @relation(fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario")
 
-  @@index([id_usuario], map: "fk_usuario")
+  @@index([id_usuario], map: "id_usuario")
 }
 
 model pedidos {
@@ -80,14 +83,13 @@ model pedidos {
   usuarios_pedidos_id_usuarioTousuarios  usuarios           @relation("pedidos_id_usuarioTousuarios", fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_pedido")
   usuarios_pedidos_id_vendedorTousuarios usuarios           @relation("pedidos_id_vendedorTousuarios", fields: [id_vendedor], references: [id], onUpdate: Restrict, map: "fk_vendedor_pedido")
 
-  @@index([id_usuario], map: "fk_usuario_pedido")
-  @@index([id_vendedor], map: "fk_vendedor_pedido")
+  @@index([id_usuario], map: "id_usuario")
+  @@index([id_vendedor], map: "id_vendedor")
 }
 
 model usuarios {
-  id     Int    @id @default(autoincrement())
-  token  String @unique @db.VarChar(600)
-  correo String @db.VarChar(300) // <-- Añade este campo
+  id                                    Int             @id @default(autoincrement())
+  correo                                String          @db.VarChar(300)
   datos_usuario                         datos_usuario[]
   favoritos                             favoritos[]
   mangas                                mangas[]

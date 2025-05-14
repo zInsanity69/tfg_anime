@@ -18,6 +18,7 @@ import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { EditPencilIcon } from "@/components/icons";
 import { useAuth } from "@/context/AuthContext";
+import { restablecerContrasena } from "@/config/auth";
 
 export default function Config() {
   const { user } = useAuth();
@@ -102,6 +103,11 @@ export default function Config() {
     } catch (err) {
       console.error("❌ Error al actualizar datos:", err);
     }
+  };
+
+  const handleSubmit = async () => {
+    await restablecerContrasena(email);
+    alert("Se ha enviado un correo para restablecer la contraseña");
   };
 
   return (
@@ -269,7 +275,11 @@ export default function Config() {
                         "Borra permanentemente tu cuenta.",
                       ];
                       const controls = [
-                        <Button size="sm" variant="bordered">
+                        <Button
+                          onPress={handleSubmit}
+                          size="sm"
+                          variant="bordered"
+                        >
                           Cambiar
                         </Button>,
                         <Switch defaultSelected />,

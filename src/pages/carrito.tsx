@@ -1,5 +1,5 @@
 // src/pages/mangas.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
@@ -22,11 +22,10 @@ interface Manga {
   quantity: number;
 }
 
-export default function MangaPage() {
+export default function CarritoPage() {
   const navigate = useNavigate();
   const { search: qs } = useLocation();
   const params = new URLSearchParams(qs);
-  const genreParam = params.get("genre") || "Todos";
 
   const commonImg =
     "https://cdn.agapea.com/NORMA-EDITORIAL-S-A-/FIRE-FORCE-25-i7n22513263.jpg";
@@ -84,11 +83,11 @@ export default function MangaPage() {
               onPress={() => navigate(`/manga/${idx}`)}
             >
               <CardBody className="flex flex-col items-center gap-4 p-4">
-                <div className="w-32 h-48 overflow-hidden rounded-lg bg-default-200">
+                <div className="h-48 overflow-hidden rounded-t-lg">
                   <Image
-                    src={item.img}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    src={item.img}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 <h2 className="font-semibold text-lg">{item.title}</h2>

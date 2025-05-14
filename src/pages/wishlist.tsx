@@ -98,8 +98,8 @@ export default function WishlistPage() {
                   <div className="h-48 overflow-hidden rounded-t-lg">
                     <Image
                       alt={item.title}
-                      src={item.img || commonImg}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      src={item.img}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
                   <div className="p-4 flex-1">

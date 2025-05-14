@@ -15,6 +15,8 @@ import VentasPage from "./pages/ventas.tsx";
 import CartPage from "./pages/carrito.tsx";
 import Logout from "./pages/cerrarsesion.tsx";
 import RecuperarContrasena from "./pages/recuperarConstraseña.tsx";
+import PurchasesPage from "./pages/compras.tsx";
+import CarritoPage from "./pages/carrito.tsx";
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/cerrarsesion" element={<Logout />} />
       <Route path="/recuperar" element={<RecuperarContrasena />} />
+      <Route path="/miscompras" element={<PurchasesPage />} />
+      <Route path="/carrito" element={<CarritoPage />} />
 
       {/* RUTAS PROTEGIDAS */}
       <Route

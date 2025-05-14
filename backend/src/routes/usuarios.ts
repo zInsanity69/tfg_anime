@@ -5,27 +5,28 @@ import { Request, Response } from "express";
 const router = Router();
 const prisma = new PrismaClient();
 
+// 🔹 GET: Obtener usuario por correo (ahora solo con 'correo')
 router.get("/usuarios", async (req: Request, res: Response) => {
-  const rawToken = req.query.token;
+  const rawCorreo = req.query.correo;
 
-  const token =
-    typeof rawToken === "string"
-      ? rawToken
-      : Array.isArray(rawToken)
-        ? rawToken[0]
+  const correo =
+    typeof rawCorreo === "string"
+      ? rawCorreo
+      : Array.isArray(rawCorreo)
+        ? rawCorreo[0]
         : undefined;
 
-  if (!token) {
-    res.status(400).json({ error: "Token inválido" });
+  if (!correo) {
+    return res.status(400).json({ error: "Correo inválido" });
   }
 
   try {
     const usuario = await prisma.usuarios.findFirst({
-      where: { token },
+      where: { correo },
     });
 
     if (!usuario) {
-      res.status(404).json({ error: "No encontrado" });
+      return res.status(404).json({ error: "No encontrado" });
     }
 
     res.json(usuario);
@@ -35,19 +36,20 @@ router.get("/usuarios", async (req: Request, res: Response) => {
   }
 });
 
-// 🔹 POST: Crear usuario si no existe
+// 🔹 POST: Crear usuario si no existe (solo con correo)
 router.post("/usuarios", async (req, res) => {
-  const { token, correo } = req.body;
+  const { correo } = req.body;
 
-  if (!token || !correo) {
-    res.status(400).json({ error: "Token y correo requeridos." });
+  if (!correo) {
+    return res.status(400).json({ error: "Correo requerido." });
   }
 
   try {
-    const existe = await prisma.usuarios.findFirst({ where: { token } });
-    if (existe) res.status(200).json({ message: "Ya existe", usuario: existe });
+    const existe = await prisma.usuarios.findFirst({ where: { correo } });
+    if (existe)
+      return res.status(200).json({ message: "Ya existe", usuario: existe });
 
-    const nuevo = await prisma.usuarios.create({ data: { token, correo } });
+    const nuevo = await prisma.usuarios.create({ data: { correo } });
     res.status(201).json(nuevo);
   } catch (err) {
     console.error(err);
@@ -111,6 +113,26 @@ router.put("/usuarios/:id", async (req, res) => {
     res
       .status(500)
       .json({ error: "Error al actualizar los datos del usuario." });
+  }
+});
+
+// 🔹 GET: Obtener datos de perfil
+router.get("/usuarios/:id/detalles", async (req, res) => {
+  const id_usuario = parseInt(req.params.id);
+
+  try {
+    const detalles = await prisma.datos_usuario.findFirst({
+      where: { id_usuario },
+    });
+
+    if (!detalles) {
+      return res.status(404).json({ error: "Detalles no encontrados" });
+    }
+
+    res.json(detalles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener detalles" });
   }
 });
 

@@ -124,6 +124,12 @@ export const Navbar = () => {
                 <DropdownItem key="wishlist" href="/wishlist">
                   Wishlist
                 </DropdownItem>
+                <DropdownItem key="miscompras" href="/miscompras">
+                  Mis compras
+                </DropdownItem>
+                <DropdownItem key="carrito" href="/carrito">
+                  Carrito
+                </DropdownItem>
                 <DropdownItem
                   key="cerrar_sesion"
                   href="/cerrarsesion"
@@ -171,6 +177,12 @@ export const Navbar = () => {
                 </DropdownItem>
                 <DropdownItem key="wishlist" href="/wishlist">
                   Wishlist
+                </DropdownItem>
+                <DropdownItem key="miscompras" href="/miscompras">
+                  Mis compras
+                </DropdownItem>
+                <DropdownItem key="carrito" href="/carrito">
+                  Carrito
                 </DropdownItem>
                 <DropdownItem
                   key="cerrar_sesion"
