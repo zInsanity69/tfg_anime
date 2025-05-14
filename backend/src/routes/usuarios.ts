@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // 🔹 GET: Obtener usuario por correo (ahora solo con 'correo')
-router.get("/usuarios", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   const rawCorreo = req.query.correo;
 
   const correo =
@@ -37,7 +37,7 @@ router.get("/usuarios", async (req: Request, res: Response) => {
 });
 
 // 🔹 POST: Crear usuario si no existe (solo con correo)
-router.post("/usuarios", async (req, res) => {
+router.post("/", async (req, res) => {
   const { correo } = req.body;
 
   if (!correo) {
@@ -58,7 +58,7 @@ router.post("/usuarios", async (req, res) => {
 });
 
 // 🔹 PUT: Actualizar o crear detalles de usuario
-router.put("/usuarios/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const id_usuario = parseInt(req.params.id);
   const {
     nombre_usuario,
@@ -117,7 +117,7 @@ router.put("/usuarios/:id", async (req, res) => {
 });
 
 // 🔹 GET: Obtener datos de perfil
-router.get("/usuarios/:id/detalles", async (req, res) => {
+router.get("/:id/detalles", async (req, res) => {
   const id_usuario = parseInt(req.params.id);
 
   try {

@@ -27,7 +27,6 @@ model detalles_pedidos {
   id        Int     @id @default(autoincrement())
   id_pedido Int
   id_mangas Int
-  fecha     String  @db.VarChar(100)
   pedidos   pedidos @relation(fields: [id_pedido], references: [id], onUpdate: Restrict, map: "fk_pedido")
   mangas    mangas  @relation(fields: [id_mangas], references: [id], onUpdate: Restrict, map: "fk_manga")
 
@@ -79,6 +78,8 @@ model pedidos {
   id_vendedor                            Int
   precio                                 Int
   estado                                 String             @db.VarChar(100)
+  fecha                                  String             @db.VarChar(100)
+  cantidad                               Int
   detalles_pedidos                       detalles_pedidos[]
   usuarios_pedidos_id_usuarioTousuarios  usuarios           @relation("pedidos_id_usuarioTousuarios", fields: [id_usuario], references: [id], onUpdate: Restrict, map: "fk_usuario_pedido")
   usuarios_pedidos_id_vendedorTousuarios usuarios           @relation("pedidos_id_vendedorTousuarios", fields: [id_vendedor], references: [id], onUpdate: Restrict, map: "fk_vendedor_pedido")

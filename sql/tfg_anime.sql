@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-05-2025 a las 22:35:35
+-- Tiempo de generación: 15-05-2025 a las 00:41:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -56,8 +56,7 @@ INSERT INTO `datos_usuario` (`id`, `nombre_usuario`, `nombre`, `apellido`, `tele
 CREATE TABLE `detalles_pedidos` (
   `id` int(11) NOT NULL,
   `id_pedido` int(11) NOT NULL,
-  `id_mangas` int(11) NOT NULL,
-  `fecha` varchar(100) NOT NULL
+  `id_mangas` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -113,7 +112,9 @@ CREATE TABLE `pedidos` (
   `id_usuario` int(11) NOT NULL,
   `id_vendedor` int(11) NOT NULL,
   `precio` int(11) NOT NULL,
-  `estado` varchar(100) NOT NULL
+  `estado` varchar(100) NOT NULL,
+  `fecha` varchar(100) NOT NULL,
+  `cantidad` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
