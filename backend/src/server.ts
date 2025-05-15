@@ -6,6 +6,7 @@ import favoritosRouter from "./routes/favoritos";
 import pedidosRouter from "./routes/pedidos";
 import detallesRouter from "./routes/detalles";
 import imagenesRouter from "./routes/imagenes";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,11 @@ app.use("/api/favoritos", favoritosRouter);
 app.use("/api/pedidos", pedidosRouter);
 app.use("/api/detalles", detallesRouter);
 app.use("/api/imagenes", imagenesRouter);
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "..", "public", "uploads")),
+);
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

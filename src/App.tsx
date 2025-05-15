@@ -28,10 +28,24 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/cerrarsesion" element={<Logout />} />
       <Route path="/recuperar" element={<RecuperarContrasena />} />
-      <Route path="/miscompras" element={<PurchasesPage />} />
-      <Route path="/carrito" element={<CarritoPage />} />
 
       {/* RUTAS PROTEGIDAS */}
+      <Route
+        path="/miscompras"
+        element={
+          <PrivateRoute>
+            <PurchasesPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/carrito"
+        element={
+          <PrivateRoute>
+            <CarritoPage />
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/config"
         element={
@@ -61,14 +75,6 @@ export default function App() {
         element={
           <PrivateRoute>
             <WishlistPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/carrito"
-        element={
-          <PrivateRoute>
-            <CartPage />
           </PrivateRoute>
         }
       />

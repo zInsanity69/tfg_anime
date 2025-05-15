@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Tabs,
   Tab,
@@ -21,13 +21,13 @@ import { useAuth } from "@/context/AuthContext";
 import { restablecerContrasena } from "@/config/auth";
 
 export default function Config() {
-  const { user } = useAuth();
+  const { user, idUsuario } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState(
     user?.photoURL || "https://i.pravatar.cc/150?u=default",
   );
 
-  const [username, setUsername] = useState(user?.displayName || "");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState(user?.email || "");
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -35,6 +35,32 @@ export default function Config() {
   const [pais, setPais] = useState("");
   const [direccion, setDireccion] = useState("");
   const [codigoPostal, setCodigoPostal] = useState("");
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!idUsuario) return;
+      try {
+        const res = await fetch(
+          `http://localhost:3001/api/usuarios/${idUsuario}/detalles`,
+        );
+        if (!res.ok)
+          throw new Error("No se pudieron obtener los detalles del usuario");
+        const data = await res.json();
+        setUsername(data.nombre_usuario || "");
+        setNombre(data.nombre || "");
+        setApellido(data.apellido || "");
+        setTelefono(data.telefono || "");
+        setPais(data.pais || "");
+        setDireccion(data.direccion || "");
+        setCodigoPostal(data.codigo_postal || "");
+        setAvatarUrl(data.url_avatar || user?.photoURL || "");
+      } catch (err) {
+        console.error("Error al obtener detalles del usuario:", err);
+      }
+    };
+
+    fetchUserDetails();
+  }, [idUsuario]);
 
   const handleUploadClick = () => {
     fileInputRef.current!.click();
@@ -46,51 +72,26 @@ export default function Config() {
 
     const previewUrl = URL.createObjectURL(file);
     setAvatarUrl(previewUrl);
-
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const res = await fetch("/api/upload-avatar", {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Upload failed");
-      const { url } = await res.json();
-      setAvatarUrl(url);
-    } catch (err) {
-      console.error(err);
-    }
-
     e.target.value = "";
   };
 
   const handleGuardarCambios = async () => {
-    if (!user?.email) return;
+    if (!idUsuario) return;
+
+    const datos = {
+      nombre_usuario: username,
+      nombre,
+      apellido,
+      telefono,
+      pais,
+      direccion,
+      codigo_postal: codigoPostal,
+      url_avatar: avatarUrl,
+    };
 
     try {
-      const userRes = await fetch(
-        `http://localhost:3001/api/usuarios/${encodeURIComponent(user.email)}`,
-      );
-      if (!userRes.ok)
-        throw new Error("Usuario no encontrado en base de datos");
-
-      const usuario = await userRes.json();
-      const id_usuario = usuario.id;
-
-      const datos = {
-        nombre_usuario: username,
-        nombre,
-        apellido,
-        telefono,
-        pais,
-        direccion,
-        codigo_postal: codigoPostal,
-        url_avatar: avatarUrl,
-      };
-
       const res = await fetch(
-        `http://localhost:3001/api/usuarios/${id_usuario}`,
+        `http://localhost:3001/api/usuarios/${idUsuario}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -100,6 +101,7 @@ export default function Config() {
 
       if (!res.ok) throw new Error("Error al guardar datos");
       console.log("✅ Datos actualizados");
+      alert("Datos guardados correctamente");
     } catch (err) {
       console.error("❌ Error al actualizar datos:", err);
     }
@@ -111,7 +113,7 @@ export default function Config() {
   };
 
   return (
-    <DefaultLayout hideFooter>
+    <DefaultLayout>
       <section className="flex justify-center py-4 px-2 md:py-8 md:px-6">
         <div className="w-full max-w-5xl bg-default-100 shadow-xl rounded-3xl p-4 md:p-8">
           <h1 className={`${title()} mb-4 md:mb-6 text-lg md:text-2xl`}>

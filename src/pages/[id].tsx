@@ -1,4 +1,8 @@
-import { useState } from "react";
+// src/pages/MangaDetail.tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import DefaultLayout from "@/layouts/default";
 import {
   Image,
@@ -14,44 +18,159 @@ import {
 } from "@heroui/react";
 import { title } from "@/components/primitives";
 import { HeartIcon } from "@/components/icons";
-import { useParams } from "react-router-dom";
+
+const ANILIST_QUERY = `
+  query ($search: String) {
+    Page(page: 1, perPage: 1) {
+      media(search: $search, type: MANGA) {
+        title {
+          romaji
+          english
+        }
+        staff {
+          edges {
+            role
+            node {
+              name {
+                full
+              }
+            }
+          }
+        }
+        genres
+        studios {
+          edges {
+            node {
+              name
+            }
+            isMain
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default function MangaDetail() {
-  const images = [
-    "https://cdn.agapea.com/NORMA-EDITORIAL-S-A-/FIRE-FORCE-25-i7n22513263.jpg",
-    "https://www.normaeditorial.com/upload/media/albumes/0001/06/59e6cfc748ef23abe8a147484af6f3842385cc54.jpeg",
-    "https://preview.redd.it/a8lbqmv7xji81.jpg?width=640&crop=smart&auto=webp&s=99ea5e5ba3e108c05166887092387ca5bdc257a6",
-  ];
   const { id } = useParams<{ id: string }>();
+  const [manga, setManga] = useState<any>(null);
+  const [imagenes, setImagenes] = useState<string[]>([]);
   const [imgPage, setImgPage] = useState(1);
   const [liked, setLiked] = useState(false);
-  const price = "6.99";
-
-  // Modal disclosure hook
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [author, setAuthor] = useState<string | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [editorial, setEditorial] = useState<string | null>(null);
+  const [aniTitle, setAniTitle] = useState<{
+    romaji: string;
+    english: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    // 1) Fetch nuestro manga de la API local
+    const fetchLocal = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/mangas/${id}`);
+        if (!res.ok) throw new Error("Manga no encontrado");
+        const data = await res.json();
+        setManga(data);
+      } catch (err) {
+        console.error("Error al obtener manga local:", err);
+      }
+    };
+
+    // 2) Fetch imágenes
+    const fetchImagenes = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/imagenes/${id}`);
+        if (!res.ok) throw new Error("Imágenes no encontradas");
+        const data = await res.json();
+        setImagenes(data.map((img: any) => img.url_img));
+      } catch (err) {
+        console.error("Error al obtener imágenes:", err);
+      }
+    };
+
+    fetchLocal();
+    fetchImagenes();
+  }, [id]);
+
+  useEffect(() => {
+    // Cuando tengamos el nombre local, buscamos en AniList
+    if (!manga?.nombre) return;
+
+    const fetchAniList = async () => {
+      try {
+        const res = await fetch("https://graphql.anilist.co", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: ANILIST_QUERY,
+            variables: { search: "Naruto" },
+          }),
+        });
+        const json = await res.json();
+        const media = json.data?.Page?.media?.[0];
+        if (!media) return;
+
+        // Título de AniList
+        setAniTitle({
+          romaji: media.title.romaji,
+          english: media.title.english,
+        });
+
+        // Autor
+        const authorEdge = media.staff.edges.find(
+          (e: any) => e.role === "AUTHOR",
+        );
+        setAuthor(authorEdge?.node?.name?.full || null);
+
+        // Géneros
+        setGenres(media.genres || []);
+
+        // Editorial (studio principal)
+        const mainStudio = media.studios.edges.find((e: any) => e.isMain);
+        setEditorial(mainStudio?.node?.name || null);
+      } catch (err) {
+        console.error("Error al consultar AniList:", err);
+      }
+    };
+
+    fetchAniList();
+  }, [manga]);
+
+  if (!manga) {
+    return (
+      <DefaultLayout>
+        <p className="text-center p-4">Cargando...</p>
+      </DefaultLayout>
+    );
+  }
 
   return (
     <DefaultLayout hideFooter>
       <section className="flex justify-center py-8 px-4 md:py-12 md:px-6">
         <div className="w-full max-w-5xl bg-default-100 shadow-xl rounded-3xl p-4 md:p-8">
           <div className="flex flex-col md:flex-row">
-            {/* Galería de imágenes + overlays */}
+            {/* Galería de imágenes */}
             <div className="relative w-full md:w-1/2 flex justify-center items-center overflow-hidden">
-              {/* Contenedor de tamaño fijo */}
-              <div className=" w-[40rem] md:h-[40rem] rounded-xl">
+              <div className="w-[40rem] md:h-[40rem] rounded-xl">
                 <Image
                   removeWrapper
-                  alt="Card background"
+                  alt={manga.nombre}
                   className="z-0 w-full h-full object-cover"
-                  src={images[imgPage - 1]}
+                  src={
+                    `http://localhost:3001${imagenes[imgPage - 1]}` ||
+                    "/placeholder.jpg"
+                  }
                 />
               </div>
-              {/* HeartIcon encima de la imagen */}
               <Button
                 isIconOnly
                 radius="full"
                 variant="light"
-                className="absolute top-4 right-4 bg-default data-[pressed]:scale-95 transition-transform"
+                className="absolute top-4 right-4 bg-default"
                 onPress={() => setLiked((v) => !v)}
               >
                 <HeartIcon
@@ -60,106 +179,93 @@ export default function MangaDetail() {
                   fill={liked ? "currentColor" : "none"}
                 />
               </Button>
-              {/* Paginación superpuesta */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                 <Pagination
                   showControls
                   page={imgPage}
-                  total={images.length}
-                  onChange={(p) => setImgPage(p)}
+                  total={imagenes.length || 1}
+                  onChange={setImgPage}
                   size="sm"
-                  className="rounded-full px-2 py-1 data-[pressed]:scale-95 transition-transform"
                 />
               </div>
             </div>
 
-            {/* Información */}
-            <div className="flex-1 p-4 md:p-8 flex flex-col text-white">
-              {/* Título + Precio */}
+            {/* Detalles del manga */}
+            <div className="flex-1 p-4 md:p-8 text-white flex flex-col">
               <div className="flex items-end mb-6 justify-between">
-                <h1 className={`${title()} text-2xl sm:text-3xl`}>
-                  Fire Force
-                </h1>
-                <span className="text-2xl sm:text-3xl">{price}€</span>
+                <div>
+                  <h1 className={`${title()} text-2xl sm:text-3xl`}>
+                    {manga.nombre}
+                  </h1>
+                  {aniTitle && (
+                    <p className="text-sm text-default-500">
+                      ({aniTitle.english || aniTitle.romaji})
+                    </p>
+                  )}
+                </div>
+                <span className="text-2xl sm:text-3xl">{manga.precio}€</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-6 sm:mb-8">
-                {/* Columna izquierda */}
                 <div className="space-y-3">
                   <div>
                     <h2 className="font-semibold text-base sm:text-lg">
                       Autor
                     </h2>
-                    <p className="text-sm sm:text-base">Atsushi Ōkubo</p>
-                  </div>
-                  <div>
-                    <h2 className="font-semibold text-base sm:text-lg">
-                      Editorial
-                    </h2>
-                    <p className="text-sm sm:text-base">Norma Editorial</p>
+                    <p className="text-sm sm:text-base">{author || "—"}</p>
                   </div>
                   <div>
                     <h2 className="font-semibold text-base sm:text-lg">
                       Géneros
                     </h2>
-                    <p className="text-sm sm:text-base">Acción, Aventura</p>
+                    <p className="text-sm sm:text-base">
+                      {genres.length > 0 ? genres.join(", ") : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-base sm:text-lg">
+                      Editorial
+                    </h2>
+                    <p className="text-sm sm:text-base">{editorial || "—"}</p>
                   </div>
                 </div>
-                {/* Columna derecha */}
+
                 <div className="space-y-3">
                   <div>
                     <h2 className="font-semibold text-base sm:text-lg">
                       Estado
                     </h2>
-                    <p className="text-sm sm:text-base">En curso</p>
+                    <p className="text-sm sm:text-base">{manga.estado_manga}</p>
                   </div>
                   <div>
                     <h2 className="font-semibold text-base sm:text-lg">
                       Volúmenes
                     </h2>
-                    <p className="text-sm sm:text-base">1 — 25</p>
+                    <p className="text-sm sm:text-base">{manga.volumenes}</p>
                   </div>
                   <div>
                     <h2 className="font-semibold text-base sm:text-lg">
-                      Condición
+                      Cantidad
                     </h2>
-                    <p className="text-sm sm:text-base">Muy buen estado</p>
+                    <p className="text-sm sm:text-base">{manga.cantidad}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Sinopsis con ScrollShadow */}
-              <div className="">
+              <div>
                 <h2 className="font-semibold text-lg mb-2">Sinopsis</h2>
                 <ScrollShadow className="max-h-40 overflow-y-auto pr-2">
-                  <p className="text-base">
-                    Shinra Kusakabe es un joven con la habilidad de encender sus
-                    pies al estilo de un demonio. Alista en la Brigada de monio.
-                    Alista en la Brigada de monio. Alista en la Brigada de
-                    monio. Alist la Brigada de monio. Alista en la Brigada de
-                    monio. Alista en
-                  </p>
+                  <p className="text-base">{manga.informacion_vendedor}</p>
                 </ScrollShadow>
               </div>
 
-              {/* Modal debajo de la sinopsis */}
               <Modal isOpen={isOpen} size="md" onClose={onClose}>
                 <ModalContent>
                   {(onClose) => (
                     <>
-                      <ModalHeader>Descripcion del vendedor</ModalHeader>
+                      <ModalHeader>Descripción del vendedor</ModalHeader>
                       <ModalBody>
-                        <p>
-                          Fire Force es una serie de manga escrita e ilustrada
-                          por Atsushi Ōkubo. Publicada desde 2015 en la revista
-                          Weekly Shōnen Magazine, sigue las aventuras de Shinra
-                          Kusakabe y la Brigada de la Misión Especial.
-                        </p>
-                        <p className="mt-2">
-                          La serie se caracteriza por su combinación de acción
-                          sobrenatural, humor y misterio, con escenas de combate
-                          encendidas por las llamas demoníacas de Shinra.
-                        </p>
+                        <p>{manga.informacion_vendedor}</p>
                       </ModalBody>
                       <ModalFooter>
                         <Button
@@ -175,9 +281,8 @@ export default function MangaDetail() {
                 </ModalContent>
               </Modal>
 
-              {/* Botón para abrir el modal */}
               <Button className="mt-4" variant="solid" onPress={onOpen}>
-                Descripcion vendedor
+                Ver descripción completa
               </Button>
 
               <div className="mt-4 flex flex-col sm:flex-row gap-4 sm:gap-6">

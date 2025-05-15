@@ -3,8 +3,24 @@ import { Link } from "@heroui/link";
 import { Input, Button } from "@heroui/react";
 import { TwitterIcon, DiscordIcon, GithubIcon } from "@/components/icons";
 import { siteConfig } from "@/config/site";
+import { useState } from "react";
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validación básica de email
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (isValidEmail) {
+      alert("¡Gracias por suscribirte!");
+      setEmail(""); // Limpiar el input
+    } else {
+      alert("Por favor, introduce un correo válido.");
+    }
+  };
   return (
     <footer className="bg-default-100 py-12">
       <div className="container mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -63,16 +79,15 @@ export function Footer() {
             correo.
           </p>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              // lógica de suscripción aquí
-            }}
+            onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-2"
           >
             <Input
               name="email"
               type="email"
               variant="bordered"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Tu email"
               classNames={{
                 inputWrapper: "bg-default-100",

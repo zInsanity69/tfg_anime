@@ -247,7 +247,7 @@ export default function MangaPage() {
             value={priceRange}
             minValue={0}
             maxValue={1000}
-            step={10}
+            step={1}
             formatOptions={{ style: "currency", currency: "EUR" }}
             label="Rango de precio"
             showTooltip
